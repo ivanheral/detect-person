@@ -1,0 +1,49 @@
+# Entorno virtual
+venv/
+.venv/
+env/
+
+# Python - Archivos temporales y compilados
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# Proyecto - Datos y Modelos (Arquivos pesados)
+dataset/
+dataset_split/
+runs/
+test/*
+!test/.gitkeep
+
+# Modelos YOLO (.pt)
+*.pt
+
+# Configuraciones de editores
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Sistema
+.DS_Store
+Thumbs.db
+
+# Variables de entorno
+.env
