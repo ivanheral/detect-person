@@ -1,59 +1,63 @@
-# 🌟 Detector de Celebridades (CUDA) 🌟
+# 🌟 Celebrity AI Detector (YOLO11 + WebGPU)
 
-¡Bienvenido! Este proyecto te permite crear tu propia IA capaz de reconocer celebridades usando el poder de tu tarjeta gráfica. 🚀
-
-## 📋 ¿Qué hace este proyecto?
-1. 📸 **Descarga** fotos de famosos de internet automáticamente.
-2. 🧠 **Entrena** un cerebro digital (modelo YOLO) para aprender sus caras.
-3. 🎯 **Detecta** quién es la persona en una foto nueva.
+Sistema integral de Inteligencia Artificial para la detección y clasificación de celebridades, optimizado para ejecutarse localmente (GPU CUDA) o directamente en el navegador (WebGPU/ONNX).
 
 ---
 
-## 🛠️ Instalación Rápida
-¡Sigue estos pasos y estarás listo en minutos! ⏱️
+## 🚀 Características Principales
 
-1. **Clona el repositorio** o descarga los archivos. 📂
-2. **Crea un entorno virtual** (opcional pero recomendado):
-   ```bash
-   python -m venv venv
-   venv\Scripts\activate
-   ```
-3. **Instala las dependencias**: 📦
-   ```bash
-   pip install -r requirements.txt
-   ```
+- **🔄 Pipeline Automatizado**: Descarga de dataset, entrenamiento optimizado para GPU (RTX 50 serie soportada) y despliegue.
+- **🌐 Doble Despliegue**: 
+    - **WebGPU**: Interfaz nativa en HTML/JS usando ONNX Runtime Web para máxima rapidez.
+    - **Gradio Space**: Aplicación web lista para Hugging Face Spaces (`app.py`).
+- **📦 Sincronización Directa**: Exportación automática de etiquetas (`labels.json`) y modelos al formato ONNX.
 
 ---
 
-## 🎮 Cómo se usa
-Solo necesitas ejecutar un comando. La magia ocurre en `main.py`:
+## 🛠️ Instalación y Uso
 
+### 1. Clonar y Configurar Entorno
+```bash
+# Instalar dependencias necesarias
+pip install -r requirements.txt
+```
+
+### 2. Ejecutar Menú Principal (CLI)
+Todo el sistema se gestiona desde el panel principal:
 ```bash
 python main.py
 ```
 
-### 📋 Opciones del Menú:
-*   **1. Descargar un Actor Específico** 🔍: Escribe el nombre de alguien famoso y bajaremos fotos suyas.
-*   **2. Entrenar Modelo** 🧠: Tu GPU (CUDA) empezará a aprender. ¡Es muy rápido!
-*   **3. Realizar Detección** 🧐: Pon una foto en la carpeta `test/` y la IA te dirá quién es.
-*   **4. Salir** 👋: Cierra el programa.
+En el menú podrás:
+1.  **Descargar imágenes** de cualquier famoso específico.
+2.  **Preparar el dataset base** (7 celebridades populares).
+3.  **Entrenar el modelo** YOLO11-Cls con optimización CUDA.
+4.  **Probar detecciones** localmente.
+5.  **Exportar y Subir**: Convertir a ONNX y subir a Hugging Face automáticamente.
 
 ---
 
-## 📂 Estructura del Proyecto
-*   `main.py`: 🏠 El centro de mando.
-*   `src/`: ⚙️ Los engranajes internos (lógica de descarga y entrenamiento).
-*   `models/`: 🧠 Donde se guardan los modelos base descargados.
-*   `dataset/`: 🖼️ Donde se guardan las fotos de entrenamiento.
-*   `test/`: 🧪 Pon aquí las fotos que quieras que la IA adivine.
-*   `runs/`: 💾 Donde se guarda el "cerebro" una vez entrenado.
+## 🔬 Estructura del Proyecto
+
+- `src/`: Lógica central (Modelos, Datos, Hugging Face).
+- `WebGPU/`: Frontend HTML interactivo para ejecución en navegador.
+- `app.py`: Aplicación Gradio para compartir en la nube.
+- `models/`: Directorio de modelos base pre-entrenados.
+- `requirements.txt`: Dependencias unificadas (Entorno local + Nube).
 
 ---
 
-## 💡 Requisitos del Sistema
-*   Python 3.10+ 🐍
-*   Tarjeta Gráfica NVIDIA (compatible con **CUDA**) para máxima velocidad. ⚡
-*   Conexión a internet para bajar fotos. 🌐
+## 🎯 Cómo subir a Hugging Face Spaces
+
+1. Crea un nuevo Space en **Hugging Face** (Select Gradio SDK).
+2. Sube los archivos `app.py` y `requirements.txt`.
+3. Asegúrate de configurar tu `HF_TOKEN` en el archivo `.env` para la subida automática de pesos.
 
 ---
-*Hecho con ❤️ para amantes de la IA.*
+
+## 🚀 Pruebas con WebGPU
+Para ver el detector en acción en el navegador sin intermediarios, simplemente abre la carpeta `WebGPU/` y lanza un servidor local (o usa la extensión Live Server de VS Code). ¡Toda la computación ocurrirá en tu tarjeta gráfica de forma nativa!
+
+---
+
+💡 *Desarrollado con ❤️ para IA y Detección de Celebridades.*

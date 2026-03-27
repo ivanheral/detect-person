@@ -32,7 +32,7 @@ def train(dataset="dataset", epochs=30):
     
     print(f"🚀 Iniciando entrenamiento con {len(clases)} clases: {', '.join(clases)}")
     
-    return model.train(
+    results = model.train(
         data=dataset,
         epochs=epochs,
         imgsz=224,
@@ -44,6 +44,21 @@ def train(dataset="dataset", epochs=30):
         workers=8,
         amp=True  # Automatic Mixed Precision para GPU CUDA modernas
     )
+
+    # Exportar etiquetas para WebGPU automáticamente
+    try:
+        if not os.path.exists("WebGPU"):
+            os.makedirs("WebGPU")
+        # El modelo tras entrenar ya está cargado con los nombres correctos
+        labels = {k: v.replace("_", " ").upper() for k, v in model.names.items()}
+        import json
+        with open(os.path.join("WebGPU", "labels.json"), "w", encoding="utf-8") as f:
+            json.dump(labels, f, indent=4, ensure_ascii=False)
+        print("\n✅ Etiquetas (labels.json) generadas automáticamente para WebGPU.")
+    except Exception as e:
+        print(f"\n⚠️ No se pudo generar labels.json: {e}")
+
+    return results
 
 def predict(img_path):
     """Realiza una predicción con el modelo más reciente."""
