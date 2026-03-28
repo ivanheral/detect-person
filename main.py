@@ -1,38 +1,32 @@
-import sys, os, shutil
+from src.core import PATHS, ACTORES_BASE, train, upload, predict, get_predictor
 from src.data import download_celebrity
-from src.model import train, predict
-from src.hf import upload_model
-from src.config import ACTORES_BASE, PATHS
-from test import run_interactive_test
 
-def reset_project():
-    if input("\n⚠️ ¿Borrar TODO? (s/n): ").lower() != 's': return
-    for f in ["dataset", "runs", "weights", "models"]:
-        if os.path.exists(f): shutil.rmtree(f)
-        os.makedirs(f)
-    with open(PATHS["labels"], "w") as f: import json; json.dump({}, f)
-    print("\n✅ Proyecto reseteado.")
+def run_test():
+    mod = get_predictor()
+    if not mod: return print("❌ Sin modelo.")
+    while True:
+        fs = [f for f in os.listdir(PATHS["test"]) if f.lower().endswith(('.jpg', '.jpeg', '.png'))] if PATHS["test"].exists() else []
+        [print(f"{i+1}. {f}") for i, f in enumerate(fs)]
+        print(f"{len(fs)+1}. TODAS\n{len(fs)+2}. Salir")
+        s = input("\n> ").strip()
+        if not s or s == str(len(fs)+2): break
+        if s == str(len(fs)+1): [predict(PATHS["test"]/f, mod) for f in fs]
+        elif s.isdigit() and 1 <= int(s) <= len(fs): predict(PATHS["test"]/fs[int(s)-1], mod)
+
+def reset():
+    if input("⚠️ ¿Borrar todo? (s/n): ").lower() != 's': return
+    for d in ["dataset", "runs", "weights", "models"]:
+        if PATHS[d].exists(): shutil.rmtree(PATHS[d])
+        PATHS[d].mkdir(exist_ok=True)
+    print("✅ Borrado.")
 
 def menu():
-    opts = {
-        "1": lambda: download_celebrity(input("Nombre: ")),
-        "2": lambda: [download_celebrity(a) for a in ACTORES_BASE],
-        "3": lambda: train(),
-        "4": lambda: run_interactive_test(),
-        "5": lambda: upload_model(),
-        "6": lambda: reset_project(),
-        "7": lambda: sys.exit()
-    }
-    print("\n" + "="*30 + "\n  LQSA DETECTOR (v2.0)\n" + "="*30)
-    print("1. Descargar específico\n2. Descargar 24 vecinos\n3. Entrenar\n4. Probar modelo\n5. Subir a HF\n6. 🔥 Resetear\n7. Salir")
-    
-    sel = input("\nOpción: ").strip()
-    if sel in opts: opts[sel]()
-    else: print("Opción inválida.")
+    print("\n" + "="*20 + "\n LQSA v3.0\n" + "="*20)
+    print("1. Descargar 1\n2. Descargar 24\n3. Entrenar\n4. Probar\n5. Subir HF\n6. Reset\n7. Salir")
+    s = input("\n> ").strip()
+    ops = {"1": lambda: download_celebrity(input("Nombre: ")), "2": lambda: [download_celebrity(a) for a in ACTORES_BASE], "3": train, "4": run_test, "5": upload, "6": reset, "7": sys.exit}
+    if s in ops: ops[s]()
 
 if __name__ == "__main__":
-    for f in ["dataset", "test", "models", "weights"]: os.makedirs(f, exist_ok=True)
-    while True:
-        try: menu()
-        except KeyboardInterrupt: break
-        except Exception as e: print(f"❌ Error: {e}")
+    [PATHS[d].mkdir(exist_ok=True) for d in ["dataset", "test", "models", "weights"]]
+    while True: menu()

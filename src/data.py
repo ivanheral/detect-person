@@ -1,36 +1,30 @@
-import os, shutil
+import shutil
+from pathlib import Path
 from icrawler.builtin import BingImageCrawler
 from PIL import Image
 
-def process_image(img_path, min_res=512):
+def process_image(p, res=512):
     try:
-        img = Image.open(img_path).convert("RGB")
-        w, h = img.size
-        if w < min_res or h < min_res: return None
-        size = min(w, h)
-        left, top = (w-size)//2, (h-size)//2
-        return img.crop((left, top, left+size, top+size))
+        with Image.open(p) as img:
+            img = img.convert("RGB")
+            if min(img.size) < res: return None
+            s = min(img.size)
+            l, t = (img.size[0]-s)//2, (img.size[1]-s)//2
+            return img.crop((l, t, l+s, t+s))
     except: return None
 
-def download_celebrity(query, max_imgs=40, base_dir="dataset"):
-    folder = os.path.join(base_dir, query.replace(" ", "_").lower())
-    temp = os.path.join(base_dir, f"temp_{query[:5]}")
-    os.makedirs(folder, exist_ok=True)
-    if os.path.exists(temp): shutil.rmtree(temp)
-    os.makedirs(temp)
-
-    print(f"🔎 Buscando rostros de '{query}'...")
-    crawler = BingImageCrawler(storage={'root_dir': temp}, log_level=40)
-    crawler.crawl(keyword=f"{query} face portrait actor", max_num=max_imgs*2)
-
-    count = 0
-    for f in sorted(os.listdir(temp)):
-        if count >= max_imgs: break
-        img = process_image(os.path.join(temp, f))
+def download_celebrity(q, max_i=40):
+    folder, temp = Path("dataset")/q.replace(" ","_").lower(), Path("dataset")/f"t_{q[:3]}"
+    folder.mkdir(parents=True, exist_ok=True)
+    if temp.exists(): shutil.rmtree(temp)
+    temp.mkdir()
+    BingImageCrawler(storage={'root_dir': str(temp)}, log_level=40).crawl(keyword=f"{q} face", max_num=max_i*2)
+    c = 0
+    for f in sorted(temp.iterdir()):
+        if c >= max_i: break
+        img = process_image(f)
         if img:
-            img.save(os.path.join(folder, f"{count}.jpg"), "JPEG", quality=90)
-            count += 1
-            print(f"[{count}/{max_imgs}] {query}")
-
+            img.save(folder/f"{c}.jpg", "JPEG", quality=90)
+            c += 1
+            print(f"[{c}/{max_i}] {q}")
     shutil.rmtree(temp, ignore_errors=True)
-    return count

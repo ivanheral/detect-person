@@ -1,25 +1,24 @@
-# Repositorio extra para soporte GPU (RTX 40/50 serie)
+# 🚀 Soporte GPU (RTX 40/50 serie)
 --extra-index-url https://download.pytorch.org/whl/cu128
 
-# Librerías Core de IA (con soporte CUDA)
+# 🧠 Core IA
 torch
 torchvision
-torchaudio
+ultralytics>=8.3.0
 
-# Entrenamiento e Inferencia (Ultralytics & ONNX)
-ultralytics
+# ⚙️ Inferencia & Web (ONNX)
 onnx
 onnxslim
 onnxruntime-gpu
 
-# Descarga y Procesamiento de Datos
+# 📥 Datos & Procesamiento
 icrawler
 requests
 Pillow
 opencv-python-headless
 numpy
 
-# Interfaz y Despliegue (Local & Spaces)
+# 🌐 Interfaz & Nube
 gradio
 huggingface-hub
 python-dotenv

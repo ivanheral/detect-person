@@ -1,16 +1,17 @@
-# 🌟 Celebrity AI Detector (YOLO11 + WebGPU)
+# 🌟 Celebrity AI Detector
 
-Sistema integral de Inteligencia Artificial para la detección y clasificación de celebridades, optimizado para ejecutarse localmente (GPU CUDA) o directamente en el navegador (WebGPU/ONNX).
+Sistema de Inteligencia Artificial para la detección y clasificación de celebridades (específicamente actores de 'La que se avecina'), optimizado para ejecución local (CUDA) y despliegue web (Hugging Face / WebGPU).
 
 ---
 
 ## 🚀 Características Principales
 
-- **🔄 Pipeline Automatizado**: Descarga de dataset, entrenamiento optimizado para GPU (RTX 50 serie soportada) y despliegue.
-- **🌐 Doble Despliegue**: 
-    - **WebGPU**: Interfaz nativa en HTML/JS usando ONNX Runtime Web para máxima rapidez.
-    - **Gradio Space**: Aplicación web lista para Hugging Face Spaces (`app.py`).
-- **📦 Sincronización Directa**: Exportación automática de etiquetas (`labels.json`) y modelos al formato ONNX.
+- **💎 Arquitectura Minimalista**: Toda la lógica central consolidada en un único motor (`src/core.py`).
+- **🔄 Pipeline Todo-en-Uno**: Gestión completa desde un solo menú interactivo (`main.py`).
+- **🌐 Inferencia Doble**:
+    - **Gradio**: Aplicación web lista para Hugging Face Spaces (`app.py`).
+    - **WebGPU**: Ejecución nativa en navegador usando ONNX Runtime.
+- **📦 Sincronización Inteligente**: Generación automática de etiquetas y exportación ONNX simplificada.
 
 ---
 
@@ -18,46 +19,35 @@ Sistema integral de Inteligencia Artificial para la detección y clasificación 
 
 ### 1. Clonar y Configurar Entorno
 ```bash
-# Instalar dependencias necesarias
+# Instalar dependencias optimizadas
 pip install -r requirements.txt
 ```
 
-### 2. Ejecutar Menú Principal (CLI)
-Todo el sistema se gestiona desde el panel principal:
+### 2. Ejecutar Gestor Principal
 ```bash
 python main.py
 ```
-
-En el menú podrás:
-1.  **Descargar imágenes** de cualquier famoso específico.
-2.  **Preparar el dataset base** (7 celebridades populares).
-3.  **Entrenar el modelo** YOLO11-Cls con optimización CUDA.
-4.  **Probar detecciones** localmente.
-5.  **Exportar y Subir**: Convertir a ONNX y subir a Hugging Face automáticamente.
+Desde este menú podrás:
+1. **Descargar dataset**: Individual o el set base de 24 actores.
+2. **Entrenar**: Crea tu modelo YOLO11-Cls optimizado.
+3. **Probar**: Inferencia interactiva sobre la carpeta `test/`.
+4. **Desplegar**: Sube automáticamente pesos y etiquetas a Hugging Face.
 
 ---
 
 ## 🔬 Estructura del Proyecto
 
-- `src/`: Lógica central (Modelos, Datos, Hugging Face).
-- `WebGPU/`: Frontend HTML interactivo para ejecución en navegador.
-- `app.py`: Aplicación Gradio para compartir en la nube.
-- `models/`: Directorio de modelos base pre-entrenados.
-- `requirements.txt`: Dependencias unificadas (Entorno local + Nube).
+El proyecto ha sido reducido a su expresión mínima funcional:
+- `src/core.py`: Motor central (IA, Rutas, Hugging Face).
+- `src/data.py`: Descarga y procesamiento de imágenes.
+- `main.py`: Interfaz CLI y herramientas de prueba.
+- `app.py`: Aplicación Gradio (Interfaz Web).
+- `WebGPU/`: Frontend estático para ejecución nativa en cliente.
+- `requirements.txt`: Dependencias limpias y organizadas.
 
 ---
 
-## 🎯 Cómo subir a Hugging Face Spaces
-
-1. Crea un nuevo Space en **Hugging Face** (Select Gradio SDK).
-2. Sube los archivos `app.py` y `requirements.txt`.
-3. Asegúrate de configurar tu `HF_TOKEN` en el archivo `.env` para la subida automática de pesos.
+## 🚀 Despliegue en Hugging Face
+Crea un Space de tipo **Gradio SDK** y sube `app.py`, `requirements.txt` y tu carpeta `src/`. Configura tu `HF_TOKEN` en variables de entorno para que `main.py` pueda subir los modelos automáticamente.
 
 ---
-
-## 🚀 Pruebas con WebGPU
-Para ver el detector en acción en el navegador sin intermediarios, simplemente abre la carpeta `WebGPU/` y lanza un servidor local (o usa la extensión Live Server de VS Code). ¡Toda la computación ocurrirá en tu tarjeta gráfica de forma nativa!
-
----
-
-💡 *Desarrollado con ❤️ para IA y Detección de Celebridades.*
