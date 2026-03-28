@@ -13,7 +13,7 @@ onnxslim
 onnxruntime-gpu
 
 # Descarga y Procesamiento de Datos
-ddgs
+icrawler
 requests
 Pillow
 opencv-python-headless

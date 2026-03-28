@@ -1,6 +1,6 @@
-# 🌐 WebGPU Celebrity Detector
+# 🌐 WebGPU LQSA Vecino Detector
 
-Este es el frontend web para tu detector de celebridades. Utiliza **Transformers.js** para ejecutar modelos de inteligencia artificial directamente en el navegador del usuario, aprovechando la aceleración por hardware (**WebGPU** / WebGL).
+Este es el frontend web para tu detector de personajes de **"La que se avecina"**. Utiliza **ONNX Runtime Web** para ejecutar el modelo de clasificación directamente en el navegador del usuario, aprovechando la aceleración por hardware (**WebGPU** / WebGL).
 
 ## 🚀 Cómo usar este sitio
 

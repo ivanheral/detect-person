@@ -1,77 +1,34 @@
 import os
 from ultralytics import YOLO
-from src.utils import get_device, validate_dataset
-import shutil
+from src.utils import get_device, validate_dataset, export_model_assets
+from src.config import PATHS
 
-def train(dataset="dataset", epochs=30):
-    """Entrena el modelo YOLO11."""
-    # 1. Validar dataset
+def train(dataset=PATHS["dataset"], epochs=30):
     valido, clases, msg = validate_dataset(dataset)
-    if not valido:
-        print(f"❌ Error en el dataset: {msg}")
-        print("💡 Asegúrate de haber descargado imágenes suficientes para al menos 2 personas.")
-        return None
+    if not valido: return print(f"❌ {msg}")
 
-    # 2. Limpieza preventiva
-    # Borramos splits anteriores y cachés que causan el error de 'found 1 classes'
-    for path in ["dataset_split", os.path.join(dataset, "train"), os.path.join(dataset, "val")]:
-        if os.path.exists(path):
-            try:
-                shutil.rmtree(path)
-            except:
-                pass
-    
+    # Limpieza automática
     for f in os.listdir(dataset):
-        if f.endswith(".cache"):
-            os.remove(os.path.join(dataset, f))
-
-    device = get_device()
-    # Cargamos el modelo desde la carpeta 'models'
-    model_path = os.path.join("models", "yolo11n-cls.pt")
-    model = YOLO(model_path)
+        if f.endswith(".cache"): os.remove(os.path.join(dataset, f))
     
-    print(f"🚀 Iniciando entrenamiento con {len(clases)} clases: {', '.join(clases)}")
+    model = YOLO(os.path.join(PATHS["models"], "yolo11n-cls.pt"))
+    print(f"🚀 Entrenando con {len(clases)} clases...")
     
-    results = model.train(
-        data=dataset,
-        epochs=epochs,
-        imgsz=224,
-        device=device,
-        project="celebrity_detector",
-        name="run",
-        exist_ok=True, # Sobrescribe 'run' si ya existe para no llenar el disco de carpetas run1, run2...
-        batch=16, # Ajustado para 16GB VRAM (puedes subirlo a 32 o 64 si quieres ir más rápido)
-        workers=8,
-        amp=True  # Automatic Mixed Precision para GPU CUDA modernas
+    model.train(
+        data=dataset, epochs=epochs, imgsz=224, device=get_device(),
+        project="celebrity_detector", name="run", exist_ok=True,
+        batch=16, workers=8, amp=True
     )
 
-    # Exportar etiquetas para WebGPU automáticamente
-    try:
-        if not os.path.exists("WebGPU"):
-            os.makedirs("WebGPU")
-        # El modelo tras entrenar ya está cargado con los nombres correctos
-        labels = {k: v.replace("_", " ").upper() for k, v in model.names.items()}
-        import json
-        with open(os.path.join("WebGPU", "labels.json"), "w", encoding="utf-8") as f:
-            json.dump(labels, f, indent=4, ensure_ascii=False)
-        print("\n✅ Etiquetas (labels.json) generadas automáticamente para WebGPU.")
-    except Exception as e:
-        print(f"\n⚠️ No se pudo generar labels.json: {e}")
-
-    return results
+    # Exportación automática unificada
+    export_model_assets(model)
+    return model
 
 def predict(img_path):
-    """Realiza una predicción con el modelo más reciente."""
-    model_path = os.path.join("runs", "classify", "celebrity_detector", "run", "weights", "best.pt")
-    
-    if not os.path.exists(model_path):
-        print(f"❌ No se encontró el modelo en: {model_path}")
-        print("Asegúrate de haber completado el entrenamiento (Opción 3).")
-        return
+    model_path = os.path.join(PATHS["runs"], "classify", "celebrity_detector", "run", "weights", "best.pt")
+    if not os.path.exists(model_path): return print("❌ Primero entrena (Opción 3).")
 
-    model = YOLO(model_path)
-    res = model(img_path)[0]
-    
+    res = YOLO(model_path)(img_path, verbose=False)[0]
     name = res.names[res.probs.top1].replace("_", " ").upper()
     conf = res.probs.top1conf.item() * 100
     print(f"\n🌟 DETECCIÓN: {name} ({conf:.1f}%)")
