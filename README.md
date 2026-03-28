@@ -1,6 +1,6 @@
 # 🌟 Celebrity AI Detector
 
-Sistema de Inteligencia Artificial para la detección y clasificación de celebridades (específicamente actores de 'La que se avecina'), optimizado para ejecución local (CUDA) y despliegue web (Hugging Face / WebGPU).
+Sistema de Inteligencia Artificial para la detección y clasificación de celebridades (específicamente actores de 'Aquí no hay quien viva'), optimizado para ejecución local (CUDA) y despliegue web (Hugging Face / WebGPU).
 
 ---
 
@@ -18,12 +18,35 @@ Sistema de Inteligencia Artificial para la detección y clasificación de celebr
 ## 🛠️ Instalación y Uso
 
 ### 1. Clonar y Configurar Entorno
+
+Se recomienda usar un entorno virtual para mantener las dependencias aisladas:
+
 ```bash
+# Crear entorno virtual
+python -m venv .venv
+
+# Activar entorno virtual
+# En Linux/macOS:
+source .venv/bin/activate
+# En Windows:
+# .venv\Scripts\activate
+
 # Instalar dependencias optimizadas
 pip install -r requirements.txt
 ```
 
-### 2. Ejecutar Gestor Principal
+### 2. Configurar Variables de Entorno
+
+Para habilitar la subida automática a Hugging Face, crea un archivo `.env` en la raíz del proyecto:
+
+```bash
+# Crear archivo .env (o créalo manualmente)
+echo "HF_TOKEN=tu_token_de_hugging_face_aqui" > .env
+```
+> [!TIP]
+> Puedes obtener tu token en [Hugging Face Settings](https://huggingface.co/settings/tokens).
+
+### 3. Ejecutar Gestor Principal
 ```bash
 python main.py
 ```
