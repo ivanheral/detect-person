@@ -1,4 +1,4 @@
-import os, json, shutil, torch, gradio as gr
+import os, json, shutil, torch, hashlib, gradio as gr
 from pathlib import Path
 from PIL import Image
 from dotenv import load_dotenv
@@ -7,28 +7,47 @@ from huggingface_hub import HfApi, login
 from icrawler.builtin import BingImageCrawler
 
 # --- CONFIG ---
-ACTS = ["Adrià Collado Fernando Navarro", "Beatriz Carvajal María Jesús", "Daniel Guzmán Roberto Alonso", "Diego Martín Carlos de la Fuente", "Eduardo García Josemi Cuesta", "Eduardo Gómez Mariano Delgado", "Emma Penella Doña Concha", "Eva Isanta Bea Villarejo", "Fernando Tejero Emilio Delgado", "Gemma Cuervo Vicenta Benito", "Guillermo Ortega Paco", "Isabel Ordaz Isabel Hierbas", "José Luis Gil Juan Cuesta", "Juan Díaz Álex Guerra", "Laura Pamplona Alicia Sanz", "Loles León Paloma Cuesta", "Luis Merlo Mauri Hidalgo", "Malena Alterio Belén López", "María Adánez Lucía Álvarez", "Mariví Bilbao Marisa Benito", "Nacho Guerreros José María", "Santiago Ramos Andrés Guerra", "Sofía Nieto Natalia Cuesta", "Vanesa Romero Ana"]
+ACTS = ["Carmen Machi Aída García", "Paco León Luisma García", "Pepe Viyuela Chema Martínez", "Mariano Peña Mauricio Colmenero", "Melani Olivares Paz Bermejo", "David Castillo Jonathan García", "Ana Polvorosa Lorena García", "Miren Ibarguren Soraya García", "Eduardo Casanova Fidel Martínez", "Marisol Ayuso Eugenia García", "Secun de la Rosa Toni Colmenero", "Pepa Rus Macu", "Canco Rodríguez Barajas", "Dani Martínez Simón Bermejo", "Óscar Reyes Machupichu", "Sanseverina Lazar Aidita", "Bernabé Fernández Germán", "Rafael Ramos Germán"]
 P = {k: Path(v) for k, v in {"d": "dataset", "r": "runs", "w": "weights", "t": "test", "l": "WebGPU/labels.json", "o": "weights/best.onnx", "pt": "runs/classify/det/w/weights/best.pt"}.items()}
 
 # --- DATA ---
 def download(q, n=40):
     f, t = P["d"]/q.replace(" ","_").lower(), P["d"]/f"t_{q[:3]}"
     f.mkdir(parents=True, exist_ok=True)
-    if t.exists(): shutil.rmtree(t)
-    t.mkdir()
-    BingImageCrawler(storage={'root_dir': str(t)}, log_level=40).crawl(keyword=f"{q} face", max_num=n*2)
-    c = 0
-    for file in sorted(t.iterdir()):
-        if c >= n: break
-        try:
-            with Image.open(file) as im:
-                im = im.convert("RGB")
-                if min(im.size) < 512: continue
-                s = min(im.size); l, tp = (im.size[0]-s)//2, (im.size[1]-s)//2
-                im.crop((l, tp, l+s, tp+s)).save(f/f"{c}.jpg", "JPEG", quality=90)
-                c += 1; print(f"[{c}/{n}] {q}")
-        except: pass
-    shutil.rmtree(t, ignore_errors=True)
+    def get_h(p):
+        with open(p, "rb") as bf: return hashlib.md5(bf.read()).hexdigest()
+    
+    ex = [img for img in f.iterdir() if img.suffix.lower() == ".jpg"]
+    hs = {get_h(img) for img in ex}
+    
+    if len(ex) < n:
+        print(f"🔍 {q}: {len(ex)}/{n} fotos. Descargando...")
+        if t.exists(): shutil.rmtree(t)
+        t.mkdir()
+        BingImageCrawler(storage={'root_dir': str(t)}, log_level=40).crawl(keyword=f"{q} actor portrait headshot closeup", max_num=n*4)
+        c = len(ex)
+        for file in sorted(t.iterdir()):
+            if c >= n: break
+            try:
+                h = get_h(file)
+                if h in hs: continue
+                with Image.open(file) as im:
+                    im = im.convert("RGB")
+                    if min(im.size) < 512: continue
+                    w, h_img = im.size
+                    max_dim = max(w, h_img)
+                    canvas = Image.new('RGB', (max_dim, max_dim), (0, 0, 0))
+                    canvas.paste(im, ((max_dim - w) // 2, (max_dim - h_img) // 2))
+                    canvas.save(f/f"tmp_{c}.jpg", "JPEG", quality=90)
+                    hs.add(h); c += 1; print(f"[{c}/{n}] {q}")
+            except: pass
+        shutil.rmtree(t, ignore_errors=True)
+    
+    print(f"♻️ Renombrando {q}...")
+    imgs = sorted([img for img in f.iterdir() if img.suffix.lower() == ".jpg"])
+    for i, img in enumerate(imgs): img.rename(f/f"sort_{i}.jpg")
+    for i in range(len(imgs)): (f/f"sort_{i}.jpg").rename(f/f"{i}.jpg")
+    print(f"✅ {q} listo: {len(imgs)} fotos.")
 
 # --- ENGINE ---
 def get_mod(p=None):
