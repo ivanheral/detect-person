@@ -1,6 +1,6 @@
-# 🌟 Celebrity AI Detector
+# 🌟 Spotlight AI
 
-Sistema de Inteligencia Artificial para la detección y clasificación de celebridades (específicamente actores de 'Aquí no hay quien viva'), optimizado para ejecución local (CUDA) y despliegue web (Hugging Face / WebGPU).
+Sistema de Inteligencia Artificial para la detección y clasificación de personajes y celebridades, optimizado para ejecución local (CUDA) y despliegue web (Hugging Face / WebGPU).
 
 ---
 
@@ -51,7 +51,7 @@ echo "HF_TOKEN=tu_token_de_hugging_face_aqui" > .env
 python main.py
 ```
 Desde este menú podrás:
-1. **Descargar dataset**: Individual o el set base de 24 actores.
+1. **Descargar dataset**: Individual o el set completo de actores.
 2. **Entrenar**: Crea tu modelo YOLO11-Cls optimizado.
 3. **Probar**: Inferencia interactiva sobre la carpeta `test/`.
 4. **Desplegar**: Sube automáticamente pesos y etiquetas a Hugging Face.

@@ -7,8 +7,8 @@ from huggingface_hub import HfApi, login
 from icrawler.builtin import BingImageCrawler
 
 # --- CONFIG ---
-ACTS = ["Carmen Machi Aída García", "Paco León Luisma García", "Pepe Viyuela Chema Martínez", "Mariano Peña Mauricio Colmenero", "Melani Olivares Paz Bermejo", "David Castillo Jonathan García", "Ana Polvorosa Lorena García", "Miren Ibarguren Soraya García", "Eduardo Casanova Fidel Martínez", "Marisol Ayuso Eugenia García", "Secun de la Rosa Toni Colmenero", "Pepa Rus Macu", "Canco Rodríguez Barajas", "Dani Martínez Simón Bermejo", "Óscar Reyes Machupichu", "Sanseverina Lazar Aidita", "Bernabé Fernández Germán", "Rafael Ramos Germán"]
-P = {k: Path(v) for k, v in {"d": "dataset", "r": "runs", "w": "weights", "t": "test", "l": "WebGPU/labels.json", "o": "weights/best.onnx", "pt": "runs/classify/det/w/weights/best.pt"}.items()}
+ACTS = ["Carmen Machi Aída García", "Paco León Luisma García", "Pepe Viyuela Chema Martínez", "Mariano Peña Mauricio Colmenero", "Melani Olivares Paz Bermejo", "David Castillo Jonathan García", "Ana Polvorosa Lorena García", "Miren Ibarguren Soraya García", "Eduardo Casanova Fidel Martínez", "Marisol Ayuso Eugenia García", "Secun de la Rosa Toni Colmenero", "Pepa Rus Macu", "Canco Rodríguez Barajas", "Dani Martínez Simón Bermejo", "Óscar Reyes Machupichu", "Sanseverina Lazar Aidita", "Bernabé Fernández Marcial", "Rafael Ramos Germán"]
+P = {k: Path(v) for k, v in {"d": "dataset", "ds": "dataset_split", "r": "runs", "w": "weights", "t": "test", "l": "WebGPU/labels.json", "o": "weights/best.onnx", "pt": "runs/classify/det/w/weights/best.pt"}.items()}
 
 # --- DATA ---
 def download(q, n=40):
@@ -56,7 +56,11 @@ def get_mod(p=None):
 
 def export(m):
     P["l"].parent.mkdir(parents=True, exist_ok=True); P["w"].mkdir(exist_ok=True)
-    with open(P["l"], "w", encoding="utf-8") as f: json.dump({k: v.replace("_"," ").upper() for k,v in m.names.items()}, f, indent=4, ensure_ascii=False)
+    def fmt(v):
+        p = [w.capitalize() for w in v.replace("_", " ").split()]
+        return f"{' '.join(p[:2])} ({' '.join(p[2:])})" if len(p) > 2 else f"{' '.join(p[:2])} ({p[-1]})" if len(p) == 3 else " ".join(p)
+    with open(P["l"], "w", encoding="utf-8") as f:
+        json.dump({k: fmt(v) for k, v in m.names.items()}, f, indent=4, ensure_ascii=False)
     shutil.copy(m.export(format="onnx", imgsz=224, simplify=True), P["o"])
 
 def train(e=30):

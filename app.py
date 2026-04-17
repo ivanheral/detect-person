@@ -11,7 +11,7 @@ def det(img):
     return {r.names[i].replace("_"," ").upper(): float(r.probs.data[i]) for i in range(len(r.names))}, Image.fromarray(r.plot()[:,:,::-1])
 
 with gr.Blocks() as demo:
-    gr.Markdown("# 🌟 Celebrity Detector v4.0")
+    gr.Markdown("# 🌟 Spotlight AI")
     with gr.Row():
         with gr.Column(): i, b = gr.Image(type="pil"), gr.Button("Analizar", variant="primary")
         with gr.Column(): l, o = gr.Label(num_top_classes=3), gr.Image()
